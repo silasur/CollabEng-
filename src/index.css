@@ -1,0 +1,124 @@
+
+:root {
+  font-family: Inter, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+
+/* MAIL CONFIRMATION PAGE */
+
+.confirmation-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4f6fa;
+  padding: 24px;
+}
+
+.confirmation-container {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  padding: 48px 40px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(20, 31, 56, 0.08);
+}
+
+.confirmation-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: #eaf1fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-icon span {
+  font-size: 34px;
+  color: #1f4f8c;
+}
+
+.confirmation-container h1 {
+  font-size: 28px;
+  color: #141f38;
+  margin-bottom: 14px;
+}
+
+.confirmation-description {
+  color: #667085;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.confirmation-email {
+  background: #f4f6fa;
+  border: 1px solid #e1e6ef;
+  padding: 14px;
+  border-radius: 8px;
+  color: #1f4f8c;
+  font-weight: 600;
+  margin-bottom: 22px;
+  overflow-wrap: anywhere;
+}
+
+.confirmation-info {
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.confirmation-button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #1f4f8c;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.confirmation-button:hover {
+  background: #173d70;
+}
+
+.resend-text {
+  color: #98a2b3;
+  font-size: 13px;
+  margin-top: 24px;
+}
+
+@media (max-width: 480px) {
+  .confirmation-container {
+    padding: 36px 24px;
+  }
+
+  .confirmation-container h1 {
+    font-size: 24px;
+  }
+}
