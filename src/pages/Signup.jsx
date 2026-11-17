@@ -14,16 +14,25 @@ function Signup() {
           onSubmit={(e) => {
             e.preventDefault()
 
-            const email = e.target.email.value
+            const form = new FormData(e.currentTarget)
+            const fullName = form.get('fullName').trim()
+            const email = form.get('email').trim()
+            if (!fullName) return
+
+            // Keep the profile name associated with its email until registration uses the backend.
+            localStorage.setItem(`studentName:${email.toLowerCase()}`, fullName)
 
             navigate('/confirm-email', {
               state: { email }
             })
           }}
         >
-          <label>Full Name</label>
+          <label htmlFor="signup-full-name">Full Name</label>
           <input
+            id="signup-full-name"
+            name="fullName"
             type="text"
+            autoComplete="name"
             placeholder="Enter your full name"
             required
           />
