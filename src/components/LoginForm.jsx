@@ -2,22 +2,43 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+//  demo accountn untill backend is connected
+async function verifyCredentials(email, password) {
+  return email === 'student@example.com' && password === 'demo1234'
+}
+
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
 
-    const hasCompletedFirstEnrollment =
-      localStorage.getItem('hasCompletedFirstEnrollment')
+    const form = new FormData(e.currentTarget)
+    const email = form.get('email')
+    const password = form.get('password')
 
-    if (hasCompletedFirstEnrollment === 'true') {
-      navigate('/dashboard')
-    } else {
-      navigate('/course-enrollment')
+    setErrorMessage('')
+
+    try {
+      const isValid = await verifyCredentials(email, password)
+
+      if (!isValid) {
+        setErrorMessage('Invalid email or password.')
+        return
+      }
+    } catch {
+      setErrorMessage('Unable to sign in. Please try again.')
+      return
     }
+
+    sessionStorage.setItem('currentStudentId', email)
+
+    const hasCompletedFirstEnrollment =
+      localStorage.getItem('hasCompletedFirstEnrollment') === 'true'
+
+    navigate(hasCompletedFirstEnrollment ? '/dashboard' : '/course-enrollment')
   }
 
   return (
@@ -33,6 +54,7 @@ function LoginForm() {
           <label htmlFor="email">Email</label>
           <input
             id="email"
+            name="email"
             type="email"
             placeholder="Enter your email"
             required
@@ -43,6 +65,7 @@ function LoginForm() {
           <div className="password-input-wrapper">
             <input
               id="password"
+              name="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
               required
