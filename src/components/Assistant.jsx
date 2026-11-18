@@ -38,7 +38,7 @@ async function requestReply(conversationId, messages, signal) {
   return reply.trim()
 }
 
-function AssistantSession({ children, storageKey }) {
+function AssistantSession({ children, storageKey, showLauncher }) {
   const [threads, setThreads] = useState(() => readHistory(storageKey))
   const [activeId, setActiveId] = useState(null)
   const [panelOpen, setPanelOpen] = useState(false)
@@ -129,6 +129,7 @@ function AssistantSession({ children, storageKey }) {
   return (
     <AssistantContext.Provider value={value}>
       {children}
+      {showLauncher && <AssistantTrigger floating />}
       <dialog id="assistant-panel" ref={dialog} className="assistant-drawer" aria-labelledby="assistant-drawer-title"
         onKeyDown={(event) => {
           if (event.key === 'Escape' && !event.nativeEvent.isComposing) {
@@ -138,7 +139,10 @@ function AssistantSession({ children, storageKey }) {
         }}
         onClose={() => {
           setPanelOpen(false)
-          if (trigger.current?.isConnected) trigger.current.focus()
+          // Wait until the launcher is visible again before restoring keyboard focus.
+          requestAnimationFrame(() => {
+            if (trigger.current?.isConnected) trigger.current.focus()
+          })
         }}>
         {panelOpen && (
           <>
@@ -155,18 +159,21 @@ function AssistantSession({ children, storageKey }) {
 }
 
 export function AssistantProvider({ children }) {
-  useLocation()
+  const location = useLocation()
+  const showLauncher = /^\/(?:dashboard|brainstorm|tasks|notebook|files|messages|ai-assistant|student-contributions)(?:\/|$)/.test(location.pathname)
   const student = sessionStorage.getItem('currentStudentId')
   const storageKey = student ? `collabeng.assistant.${student}` : null
-  return <AssistantSession key={storageKey ?? 'guest'} storageKey={storageKey}>{children}</AssistantSession>
+  return <AssistantSession key={storageKey ?? 'guest'} storageKey={storageKey} showLauncher={showLauncher}>{children}</AssistantSession>
 }
 
-export function AssistantTrigger() {
+export function AssistantTrigger({ floating = false }) {
   const assistant = useContext(AssistantContext)
   if (!assistant) return null
 
   return (
-    <button className="assistant-trigger" type="button" aria-label="Open AI chat"
+    <button className={floating ? 'assistant-trigger assistant-floating-trigger' : 'assistant-trigger'}
+      type="button" aria-label="Open AI Assistant" title="Ask AI Assistant"
+      aria-expanded={assistant.panelOpen}
       aria-haspopup="dialog" aria-controls="assistant-panel" onClick={assistant.openPanel}>
       <img src={assistantIcon} alt="" />
     </button>

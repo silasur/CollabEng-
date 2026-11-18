@@ -60,7 +60,7 @@ export default function Messages({ channelContexts = {}, notebooks = [], project
   const [channels, setChannels] = useState(readChannels)
   const [channel, setChannel] = useState(null)
   const [search, setSearch] = useState('')
-  const { messages, setMessages, files, entries, registerFiles } = useWorkspace()
+  const { messages, setMessages, sharedFiles, entries, registerFiles } = useWorkspace()
   const [messageDraft, setMessageDraft] = useState('')
   const [replyDraft, setReplyDraft] = useState('')
   const [contextOpen, setContextOpen] = useState(false)
@@ -84,9 +84,6 @@ export default function Messages({ channelContexts = {}, notebooks = [], project
   const context = channelContexts[channel]
   const visible = messages.filter((message) => message.channel === channel)
 
-  const sharedFiles = files.filter((file) => file.libraryUpload || file.taskId || file.notebookId
-    || (file.sources ?? []).some((source) => source.kind === 'message'
-      || entries.some((note) => note.id === source.id && note.scope === 'Shared')))
   const options = {
     task: tasks,
     notebook: [...entries.filter((note) => note.scope === 'Shared').map((note) => ({ id: note.id, label: note.title })), ...notebooks],

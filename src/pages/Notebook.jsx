@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import AppHeader from '../components/AppHeader'
+import SketchEditor from '../components/SketchEditor'
+import CadAttachment from '../components/CadAttachment'
 import { getStudentName, displayStudentName } from '../components/studentIdentity'
 import { useWorkspace } from '../components/WorkspaceData'
 import uploadIcon from '../assets/notebook/upload-cloud.svg'
@@ -21,6 +23,59 @@ function downloadAttachment(file, name = file.name) {
   link.download = name
   link.click()
   window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+const cadExtensions = ['step', 'stp', 'stl', 'dwg', 'dxf', 'sldprt', 'sldasm', 'ipt', 'iam', 'f3d', '3dm', 'iges', 'igs', 'obj']
+const attachmentAccept = ['application/pdf', '.pdf', 'image/*', ...cadExtensions.map((extension) => `.${extension}`)].join(',')
+
+function isNotebookImage(file) {
+  return Boolean(file && (file.type.startsWith('image/') || /\.(png|jpe?g|gif|webp|avif|bmp|svg)$/i.test(file.name)))
+}
+
+function NotebookImage({ file, name }) {
+  const image = useRef(null)
+  const link = useRef(null)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    const url = URL.createObjectURL(file)
+    const img = image.current
+    const anchor = link.current
+    img.src = url
+    anchor.href = url
+    return () => {
+      img.removeAttribute('src')
+      anchor.removeAttribute('href')
+      URL.revokeObjectURL(url)
+    }
+  }, [file])
+
+  return (
+    <figure className="nb-image-preview">
+      <a ref={link} target="_blank" rel="noopener noreferrer" hidden={failed}
+        aria-label={`Open full-size image: ${name}`}>
+        <img ref={image} alt={name} onError={() => setFailed(true)} />
+      </a>
+      {failed && <p role="status">Image preview unavailable. You can download the original file below.</p>}
+      <figcaption>{name}{!failed && <small>Click image to view full size</small>}</figcaption>
+    </figure>
+  )
+}
+
+function AttachmentImages({ attachments = [], compact = false }) {
+  const { files } = useWorkspace()
+  const previews = attachments.flatMap((attachment, index) => {
+    const record = attachment.fileId ? files.find(({ id }) => id === attachment.fileId) : null
+    const file = attachment.fileId ? record?.file : attachment
+    return isNotebookImage(file)
+      ? [{ key: attachment.fileId ?? index, file, name: record?.name ?? attachment.name }] : []
+  })
+  if (!previews.length) return null
+  return (
+    <div className={`nb-image-gallery${compact ? ' nb-image-gallery-compact' : ''}`} aria-label="Attached images">
+      {previews.map(({ key, file, name }) => <NotebookImage key={key} file={file} name={name} />)}
+    </div>
+  )
 }
 
 const noteSections = [
@@ -56,7 +111,8 @@ function EntryBody({ entry }) {
       ))}
       {entry.attachments?.length > 0 && (
         <section>
-          <h3>Attachments</h3>
+          <h3>Sketches & Attachments</h3>
+          <AttachmentImages attachments={entry.attachments} />
           <ul>
             {entry.attachments.map((attachment, index) => {
               const record = attachment.fileId ? files.find(({ id }) => id === attachment.fileId) : null
@@ -68,6 +124,7 @@ function EntryBody({ entry }) {
                     onClick={() => downloadAttachment(file, name)}>
                     {name}{!file && ' (file unavailable)'}
                   </button>
+                  <CadAttachment attachment={attachment} />
                 </li>
               )
             })}
@@ -171,9 +228,10 @@ export default function Notebook() {
     const selectedFiles = Array.from(files)
     if (selectedFiles.length === 0) return
     const accepted = selectedFiles.filter((file) =>
-      file.type.startsWith('image/') || file.type === 'application/pdf' || /\.pdf$/i.test(file.name),
+      isNotebookImage(file) || file.type === 'application/pdf' || /\.pdf$/i.test(file.name)
+        || cadExtensions.includes(file.name.split('.').pop().toLowerCase()),
     )
-    setAttachmentError(accepted.length < selectedFiles.length ? 'Only PDFs and images can be attached.' : '')
+    setAttachmentError(accepted.length < selectedFiles.length ? 'Attach an image, PDF or supported CAD file.' : '')
     setAttachments((previous) => [...previous, ...accepted])
   }
 
@@ -385,7 +443,10 @@ export default function Notebook() {
                 </div>
 
                 <div className="nb-attachments">
-                  <label className="nb-drop-label" htmlFor="nb-attachment-input">Attachments</label>
+                  <div className="nb-attachment-tools">
+                    <label className="nb-drop-label" htmlFor="nb-attachment-input">Sketches & Attachments</label>
+                    <SketchEditor onAdd={(file) => setAttachments((previous) => [...previous, file])} />
+                  </div>
                   <label className="nb-drop"
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={(event) => {
@@ -393,19 +454,22 @@ export default function Notebook() {
                       addAttachments(event.dataTransfer.files)
                     }}>
                     <img src={uploadIcon} alt="" />
-                    <span><strong>Drop PDFs or images here</strong><small>or click to browse from your computer</small></span>
-                    <input id="nb-attachment-input" type="file" multiple accept="application/pdf,.pdf,image/*"
+                    <span><strong>Drop images, PDFs or CAD files here</strong><small>or click to browse from your computer</small></span>
+                    <input id="nb-attachment-input" type="file" multiple accept={attachmentAccept}
                       onChange={(event) => {
                         addAttachments(event.currentTarget.files)
                         event.currentTarget.value = ''
                       }} />
                   </label>
+                  <small className="nb-attachment-help">Images appear inside your note. STEP, IGES, STL and OBJ files can be opened with Preview 3D.</small>
                   {attachmentError && <p role="alert">{attachmentError}</p>}
+                  <AttachmentImages attachments={attachments} compact />
                   {attachments.length > 0 && (
                     <ul>
                       {attachments.map((file, index) => (
                         <li key={index}>
                           <span>{files.find(({ id }) => id === file.fileId)?.name ?? file.name}</span>
+                          <CadAttachment attachment={file} />
                           <button className="nb-text-button" type="button" aria-label={`Remove ${file.name}`}
                             onClick={() => setAttachments((previous) => previous.filter((_, item) => item !== index))}>
                             Remove
