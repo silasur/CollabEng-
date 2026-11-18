@@ -3653,3 +3653,207 @@ a.cd-details:hover {
   outline-offset: 6px;
 }
 
+
+/* Floating AI launcher: displayed at the bottom right of workspace pages. */
+.assistant-trigger.assistant-floating-trigger {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 45;
+  width: 56px;
+  height: 56px;
+  border: 1px solid #dbe7ff;
+  background: #edf3ff;
+  box-shadow: 0 6px 20px rgb(15 23 42 / 16%);
+}
+
+.assistant-trigger.assistant-floating-trigger img {
+  width: 30px;
+  height: 30px;
+}
+
+.assistant-trigger.assistant-floating-trigger:hover {
+  background: #dfeaff;
+}
+
+.assistant-trigger.assistant-floating-trigger[aria-expanded="true"] {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .assistant-trigger.assistant-floating-trigger {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Notebook image previews */
+.notebook-page .nb-image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  align-items: start;
+  gap: 16px;
+  margin: 12px 0 16px;
+}
+
+.notebook-page .nb-image-preview {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.notebook-page .nb-image-preview > a {
+  display: block;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.notebook-page .nb-image-preview > a[hidden] { display: none; }
+
+.notebook-page .nb-image-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: contain;
+}
+
+.notebook-page .nb-image-preview figcaption {
+  padding: 10px 12px;
+  color: #334155;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.notebook-page .nb-image-preview figcaption small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.notebook-page .nb-image-preview > p { padding: 12px; font-size: 13px; }
+.notebook-page .nb-image-preview > a:focus-visible { outline: 2px solid #2563eb; outline-offset: -3px; }
+.notebook-page .nb-image-gallery-compact img { max-height: 180px; }
+.notebook-page .nb-attachment-help { display: block; margin-top: 8px; color: #64748b; font-size: 12px; }
+/* Reserve room for the floating AI button beside the notebook actions. */
+.notebook-page .nb-editor-actions {
+  box-sizing: border-box;
+  padding-right: calc(80px + env(safe-area-inset-right, 0px));
+  gap: 10px;
+}
+
+.notebook-page .nb-editor-actions > button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .notebook-page .nb-editor-actions {
+    padding-right: calc(64px + env(safe-area-inset-right, 0px));
+  }
+}
+/* Sketch editor and CAD preview */
+.notebook-page .nb-attachment-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.notebook-page .nb-attachments li > span { flex: 1; min-width: 0; }
+.notebook-page .nb-cad-open { margin: 4px 8px; white-space: nowrap; }
+.notebook-page .nb-tool-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(1100px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+  border: 1px solid #dbe3ef;
+  border-radius: 16px;
+  background: #fff;
+  color: #172b46;
+  font: inherit;
+}
+.notebook-page .nb-tool-dialog::backdrop { background: rgb(15 23 42 / 40%); }
+.notebook-page .nb-tool-heading,
+.notebook-page .nb-tool-footer,
+.notebook-page .nb-cad-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.notebook-page .nb-tool-dialog .nb-tool-heading h2 { margin: 0; font-size: 19px; }
+.notebook-page .nb-tool-dialog .nb-tool-heading { margin-bottom: 16px; }
+.notebook-page .nb-tool-dialog button,
+.notebook-page .nb-tool-dialog select,
+.notebook-page .nb-tool-dialog input {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+}
+.notebook-page .nb-tool-dialog button { cursor: pointer; }
+.notebook-page .nb-tool-dialog button:disabled { cursor: default; opacity: .5; }
+.notebook-page .nb-tool-dialog button.nb-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+.notebook-page .nb-tool-dialog button:focus-visible,
+.notebook-page .nb-tool-dialog canvas:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+.notebook-page .nb-tool-dialog .nb-tool-heading > button { font-size: 22px; width: 36px; height: 36px; padding: 0; }
+.notebook-page .nb-sketch-name,
+.notebook-page .nb-sketch-text { display: grid; gap: 6px; margin: 12px 0; }
+.notebook-page .nb-sketch-name input,
+.notebook-page .nb-sketch-text input { width: 100%; box-sizing: border-box; }
+.notebook-page .nb-sketch-controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.notebook-page .nb-sketch-controls label { display: grid; gap: 4px; font-size: 12px; }
+.notebook-page .nb-sketch-controls input[type="color"] { width: 44px; height: 34px; padding: 3px; }
+.notebook-page .nb-sketch-tools { display: flex; flex-wrap: wrap; gap: 5px; }
+.notebook-page .nb-sketch-tools button[aria-pressed="true"] { background: #eaf1ff; border-color: #2563eb; color: #1d4ed8; }
+.notebook-page .nb-sketch-canvas {
+  display: block;
+  width: min(100%, 83.333dvh);
+  margin-inline: auto;
+  height: auto;
+  aspect-ratio: 5 / 3;
+  min-height: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+}
+.notebook-page .nb-tool-help { font-size: 12px; color: #64748b; margin: 10px 0; }
+.notebook-page .nb-tool-footer { justify-content: flex-end; margin-top: 16px; }
+.notebook-page .nb-cad-controls p { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
+.notebook-page .nb-cad-stage { position: relative; height: clamp(280px, 55dvh, 580px); border: 1px solid #dbe3ef; border-radius: 10px; overflow: hidden; margin-top: 12px; }
+.notebook-page .nb-cad-canvas { width: 100%; height: 100%; }
+.notebook-page .nb-cad-canvas canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.notebook-page .nb-cad-status { position: absolute; inset: 0; display: grid; place-content: center; gap: 12px; margin: 0; padding: 24px; background: #f8fafc; text-align: center; }
+.notebook-page .nb-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 640px) {
+  .notebook-page .nb-tool-dialog { width: calc(100vw - 16px); max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); padding: 12px; }
+  .notebook-page .nb-attachments li { flex-wrap: wrap; }
+  .notebook-page .nb-attachments li > span { flex-basis: 100%; }
+}

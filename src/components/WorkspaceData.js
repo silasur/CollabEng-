@@ -6,7 +6,14 @@ const tasksStorageKey = 'collabeng.projectTasks'
 export function useWorkspace() {
   const workspace = useContext(WorkspaceContext)
   if (!workspace) throw new Error('WorkspaceProvider is missing.')
-  return workspace
+  // Keep raw files available to the owner's Personal notebook.
+  // Only explicitly shared sources appear in the shared library.
+  const sharedNoteIds = new Set(workspace.entries
+    .filter((entry) => entry.scope === 'Shared').map(({ id }) => id))
+  const sharedFiles = workspace.files.filter((file) => file.libraryUpload === true
+    || (file.sources ?? []).some((source) => source.kind === 'message'
+      || (source.kind === 'notebook' && sharedNoteIds.has(source.id))))
+  return { ...workspace, sharedFiles }
 }
 
 function readTasks() {
@@ -22,7 +29,7 @@ const dueDatePattern = /^\d{4}-\d{2}-\d{2}$/
 
 // Replace this data source with the project-scoped dashboard response when the API is available.
 export function useDashboardData() {
-  const { files, entries, activities, studentId } = useWorkspace()
+  const { sharedFiles, entries, activities, studentId } = useWorkspace()
   const myOpenTasks = studentId
     ? readTasks().filter((task) => task?.assigneeId === studentId
       && typeof task.title === 'string' && task.status !== 'Done')
@@ -35,8 +42,6 @@ export function useDashboardData() {
 
   const sharedEntries = entries.filter((entry) => entry.scope === 'Shared')
   const sharedIds = new Set(sharedEntries.map(({ id }) => id))
-  const sharedFiles = files.filter((file) => file.libraryUpload || file.taskId || file.notebookId
-    || (file.sources ?? []).some((source) => source.kind === 'message' || sharedIds.has(source.id)))
   const filesById = new Map(sharedFiles.map((file) => [file.id, file]))
 
   const recentActivity = activities.flatMap((activity) => {

@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { AssistantTrigger } from './Assistant'
 import ProfileMenu from './ProfileMenu'
 import ProjectNavigation from './ProjectNavigation'
 
@@ -64,7 +63,6 @@ function AppHeader({ showProjectNavigation = false }) {
         )}
 
         <div className="assistant-header-actions">
-          {showProjectNavigation && <AssistantTrigger />}
           <ProfileMenu />
         </div>
       </div>

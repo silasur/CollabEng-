@@ -58,7 +58,7 @@ function fileLinkValue(entry) {
 }
 
 export default function Files() {
-  const { files, entries, messages, setFiles, registerFiles, removeActivity } = useWorkspace()
+  const { sharedFiles: files, entries, messages, setFiles, registerFiles, removeActivity } = useWorkspace()
   const [pending, setPending] = useState([])
   const tasks = readProjectTasks()
   const links = [
@@ -172,7 +172,7 @@ export default function Files() {
     for (const source of file.sources ?? []) {
       if (source.kind === 'notebook') {
         const note = entries.find(({ id }) => id === source.id)
-        if (note) labels.push(`${note.scope === 'Personal' ? 'Personal note' : 'Notebook'} · ${note.title}`)
+        if (note?.scope === 'Shared') labels.push(`Notebook · ${note.title}`)
       } else {
         const message = messages.find(({ id }) => id === source.id)
         if (message) labels.push(`Messages · # ${message.channel}`)
